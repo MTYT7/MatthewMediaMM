@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101116">
+<title>MatthewMedia Offline Arcade</title>
+<style>
+:root{color-scheme:dark;--bg:#101116;--panel:#191b23;--line:#303341;--text:#f3f4f8;--muted:#a8abba;--accent:#8b7cff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,Arial,sans-serif}main{max-width:900px;margin:auto;padding:24px}a{color:#c4bdff}h1{margin:0 0 5px}p{color:var(--muted)}.games{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:22px}.game{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}.game h2{font-size:19px;margin:0 0 8px}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}button,input{font:inherit;border-radius:9px;border:1px solid var(--line);padding:9px 12px}button{background:var(--accent);color:white;border:0;cursor:pointer;font-weight:700}input{background:#101116;color:var(--text);min-width:0;width:100%;margin:6px 0}output{display:block;font-size:22px;font-weight:800;margin:10px 0}.muted{font-size:13px}#reactionTarget{width:100%;min-height:90px;background:#353846}#reactionTarget.ready{background:#23794e}#reactionTarget.wait{background:#963f4a}footer{margin-top:24px;font-size:13px;color:var(--muted)}@media(max-width:600px){main{padding:15px}}
+</style>
+</head>
+<body><main>
+<a href="./">← MatthewMediaMM home</a>
+<h1>Offline Arcade</h1>
+<p>These mini-games run inside this page and need no internet once this page has loaded and been cached.</p>
+<div class="games">
+<section class="game"><h2>Click challenge</h2><p>Click as many times as you can in 10 seconds.</p><output id="clickScore">Score: 0</output><output id="clickTime">Time: 10</output><button id="clickStart">Start challenge</button><button id="clickButton" disabled>Click!</button></section>
+<section class="game"><h2>Number guess</h2><p>Guess the hidden number from 1 to 100.</p><input id="guessInput" type="number" min="1" max="100" placeholder="Your guess"><div class="row"><button id="guessButton">Guess</button><button id="guessNew">New number</button></div><output id="guessMessage">Pick a number.</output></section>
+<section class="game"><h2>Reaction test</h2><p>Press start, wait for green, then click as quickly as possible. Don't click early.</p><button id="reactionTarget">Start reaction test</button><output id="reactionResult">Your time will appear here.</output></section>
+<section class="game"><h2>Memory pattern</h2><p>Remember the sequence of numbers, then enter it.</p><output id="patternDisplay">Ready?</output><button id="patternStart">Show pattern</button><input id="patternInput" placeholder="Type the numbers in order"><button id="patternCheck">Check answer</button><output id="patternResult"></output></section>
+</div>
+<footer>Offline Arcade · Progress is temporary except for browser caching. Return online to use the website viewer and online games.</footer>
+</main>
+<script>
+let clickCount=0,clickRemaining=10,clickTimer=null,clickActive=false;
+const score=document.getElementById("clickScore"),time=document.getElementById("clickTime"),clickButton=document.getElementById("clickButton");
+document.getElementById("clickStart").onclick=()=>{clearInterval(clickTimer);clickCount=0;clickRemaining=10;clickActive=true;score.textContent="Score: 0";time.textContent="Time: 10";clickButton.disabled=false;clickTimer=setInterval(()=>{clickRemaining--;time.textContent="Time: "+clickRemaining;if(clickRemaining<=0){clearInterval(clickTimer);clickActive=false;clickButton.disabled=true;time.textContent="Time's up!";}},1000)};
+clickButton.onclick=()=>{if(clickActive){clickCount++;score.textContent="Score: "+clickCount}};
+let secret=Math.floor(Math.random()*100)+1;
+document.getElementById("guessButton").onclick=()=>{const n=Number(document.getElementById("guessInput").value);const out=document.getElementById("guessMessage");if(!n||n<1||n>100){out.textContent="Enter a number from 1 to 100.";return}out.textContent=n===secret?"Correct! New number generated.":n<secret?"Too low — try again.":"Too high — try again.";if(n===secret)secret=Math.floor(Math.random()*100)+1};
+document.getElementById("guessNew").onclick=()=>{secret=Math.floor(Math.random()*100)+1;document.getElementById("guessInput").value="";document.getElementById("guessMessage").textContent="New number ready."};
+const target=document.getElementById("reactionTarget"),reactionResult=document.getElementById("reactionResult");let reactionMode="idle",reactionTimeout=null,reactionStart=0;
+target.onclick=()=>{if(reactionMode==="idle"){reactionMode="wait";target.className="wait";target.textContent="Wait for green…";reactionResult.textContent="";reactionTimeout=setTimeout(()=>{reactionMode="ready";reactionStart=performance.now();target.className="ready";target.textContent="CLICK NOW!";},1000+Math.random()*3000)}else if(reactionMode==="wait"){clearTimeout(reactionTimeout);reactionMode="idle";target.className="";target.textContent="Too soon! Try again";reactionResult.textContent="Wait until it turns green."}else{reactionResult.textContent=Math.round(performance.now()-reactionStart)+" ms";reactionMode="idle";target.className="";target.textContent="Try again"}};
+let pattern=[];
+document.getElementById("patternStart").onclick=()=>{pattern=Array.from({length:4},()=>Math.floor(Math.random()*9)+1);document.getElementById("patternDisplay").textContent=pattern.join("  ");document.getElementById("patternResult").textContent="Memorise it!";setTimeout(()=>{document.getElementById("patternDisplay").textContent="Now type it below.";},1800)};
+document.getElementById("patternCheck").onclick=()=>{const answer=document.getElementById("patternInput").value.replace(/[^0-9]/g,"");document.getElementById("patternResult").textContent=answer===pattern.join("")&&pattern.length?"Correct!":"Not quite — try another pattern.";};
+</script></body></html>
