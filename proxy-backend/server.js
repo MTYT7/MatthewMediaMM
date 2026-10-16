@@ -81,7 +81,7 @@ app.get("/fetch", async (req, res) => {
     }
     let body = Buffer.concat(chunks).toString("utf8");
     if (type.includes("html")) {
-      const base = '<base href="' + (target.origin + "/").replace(/&/g, "&amp;").replace(/"/g, "&quot;") + '">';
+      const base = '<base href="' + target.href.replace(/&/g, "&amp;").replace(/"/g, "&quot;") + '">';
       if (/<head\b[^>]*>/i.test(body)) body = body.replace(/<head\b[^>]*>/i, m => m + base);
       else body = base + body;
       res.set("Content-Security-Policy", "default-src https: data: blob: 'unsafe-inline' 'unsafe-eval'; frame-ancestors *");
