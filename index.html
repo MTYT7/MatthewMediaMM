@@ -39,7 +39,7 @@ footer{text-align:center;color:#777;font-size:12px;padding:18px 0 4px}
 <body>
 <header>
   <div class="logo"><span class="mark">◎</span><span>MatthewMedia<span class="tag"> WEB</span></span></div>
-  <div class="status">Browser viewer · Beta</div>
+  <div class="status" id="browserStatus">Browser viewer · Beta</div>
 </header>
 <main>
   <section class="intro">
@@ -158,7 +158,7 @@ footer{text-align:center;color:#777;font-size:12px;padding:18px 0 4px}
       <button class="shortcut" type="button" data-url="https://scratch.mit.edu/">Scratch</button>
       <button class="shortcut" type="button" data-url="https://maddox.page/">Maddox.page</button>
     </div>  </section>
-  <div class="note"><strong>Heads up:</strong> this is an early browser viewer, not a full browser. The server currently allows only configured domains, and some sites may not work because of their security settings or complex page features.</div>
+  <div class="note" id="browserNote"><strong>Heads up:</strong> this is an early browser viewer, not a full browser. The server currently allows only configured domains, and some sites may not work because of their security settings or complex page features.</div>
   <section class="viewer" aria-label="Website viewer">
     <iframe id="webFrame" title="Website viewer" referrerpolicy="no-referrer" src="about:blank"></iframe>
     <div class="empty" id="webEmpty"><div class="globe">◎</div><h2>Your browser is ready</h2><p>Type a website above, or choose a quick link to start.</p></div>
@@ -176,7 +176,19 @@ function openWeb(value) {
   if (u.protocol !== "https:" && u.protocol !== "http:") { alert("Only HTTP and HTTPS websites are supported."); return; }
   document.getElementById("webUrl").value = u.href;
   document.getElementById("webEmpty").style.display = "none";
-  document.getElementById("webFrame").src = BACKEND + encodeURIComponent(u.href);
+  const status = document.getElementById("browserStatus");
+  const note = document.getElementById("browserNote");
+  status.textContent = "Loading: " + u.hostname;
+  note.innerHTML = "<strong>Loading:</strong> Trying to open " + u.hostname + " through the Render viewer…";
+  const frame = document.getElementById("webFrame");
+  frame.src = BACKEND + encodeURIComponent(u.href);
+  document.querySelector(".viewer").scrollIntoView({behavior:"smooth",block:"start"});
+  window.setTimeout(() => {
+    if (status.textContent === "Loading: " + u.hostname) {
+      status.textContent = "Viewer response received";
+      note.innerHTML = "<strong>Still blank?</strong> The site may be incompatible with the basic proxy. Try Example or Wikipedia to test the connection.";
+    }
+  }, 8000);
 }
 document.getElementById("webForm").addEventListener("submit", event => { event.preventDefault(); openWeb(); });
 document.querySelectorAll("[data-url]").forEach(button => button.addEventListener("click", () => openWeb(button.dataset.url)));
