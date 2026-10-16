@@ -294,5 +294,10 @@ function openWeb(value) {
 document.getElementById("webForm").addEventListener("submit", event => { event.preventDefault(); openWeb(); });
 document.querySelectorAll("[data-url]").forEach(button => button.addEventListener("click", () => openWeb(button.dataset.url)));
 </script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
+}
+</script>
 </body>
 </html>
