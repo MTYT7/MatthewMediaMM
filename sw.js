@@ -1,8 +1,7 @@
 const CACHE_NAME = "matthewmedia-shell-v1";
 const SHELL_URLS = [
   new URL("./", self.location).href,
-  new URL("./index.html", self.location).href,
-  new URL("./offline.html", self.location).href
+  new URL("./index.html", self.location).href
 ];
 
 self.addEventListener("install", event => {
